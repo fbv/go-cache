@@ -19,9 +19,11 @@ func newPerson(name string) (*Person, error) {
 }
 
 func tryStrategy(s cache.ExpirationStrategy[*Person], names []string) {
-	people := cache.New[string, *Person](s, newPerson)
+	people := cache.New[string, *Person](s)
 	for _, name := range names {
-		p, err := people.Get(name)
+		p, err := people.Get(name, func() (*Person, error) {
+			return newPerson(name)
+		})
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -6,7 +6,6 @@ import (
 
 type Cache[K comparable, V any] struct {
 	expired ExpirationStrategy[V]
-	get     func(K) (V, error)
 	values  map[K]*item[V]
 }
 
@@ -17,18 +16,17 @@ type item[V any] struct {
 	value V
 }
 
-func New[K comparable, V any](expirationStrategy ExpirationStrategy[V], get func(K) (V, error)) *Cache[K, V] {
+func New[K comparable, V any](expirationStrategy ExpirationStrategy[V]) *Cache[K, V] {
 	return &Cache[K, V]{
 		expired: expirationStrategy,
-		get:     get,
 		values:  make(map[K]*item[V]),
 	}
 }
 
-func (c *Cache[K, V]) Get(k K) (V, error) {
+func (c *Cache[K, V]) Get(k K, get func() (V, error)) (V, error) {
 	i, ok := c.values[k]
 	if !ok || c.expired(i) {
-		n, err := c.get(k)
+		n, err := get()
 		if err != nil {
 			return n, err
 		}
