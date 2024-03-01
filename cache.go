@@ -23,10 +23,10 @@ func New[K comparable, V any](expirationStrategy ExpirationStrategy[V]) *Cache[K
 	}
 }
 
-func (c *Cache[K, V]) Get(k K, get func() (V, error)) (V, error) {
+func (c *Cache[K, V]) Get(k K, get func(k K) (V, error)) (V, error) {
 	i, ok := c.values[k]
 	if !ok || c.expired(i) {
-		n, err := get()
+		n, err := get(k)
 		if err != nil {
 			return n, err
 		}
