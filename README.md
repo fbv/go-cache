@@ -2,15 +2,6 @@
 
 ```go
 
-func loadObjectFromDatabase(ctx context.Context, db *Database, id string) (*Object, error){
-  // long loading process...
-  return object, nil
-}
-
-
-ctx := context.Background()
-db := NewDatabase()
-
 // cache instance that will expire objects if not used for 30 seconds
 c := cache.New(cache.LastAccess[*Object](30*time.Second))
 
@@ -22,6 +13,9 @@ object, ok := c.Peek("1")
 if ok {
   // object present in cache
 }
+
+ctx := context.Background()
+db := NewDatabase()
 
 // loading object if not in cache, it will remain in cache for next 30 sec
 object, err := c.Get("2", func(id string) (*Object, error) {

@@ -29,6 +29,10 @@ func (c *Cache[K, V]) Peek(k K) (V, bool) {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 	i, ok := c.values[k]
+	if ok && c.expired(i) {
+		delete(c.values, k)
+		ok = false
+	}
 	if !ok {
 		return *new(V), false
 	}
